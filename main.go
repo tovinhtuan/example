@@ -24,6 +24,7 @@ func resInformationUser(w http.ResponseWriter, r *http.Request) {
 	user := UserInformation{"To Vinh Tuan", "tuantv", "male", "11/02/1998"}
 	userJson, err := json.Marshal(user)
 	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		log.Fatalf("Error happened in JSON marshal. Err: %s", err)
 		return
 	}
@@ -39,6 +40,7 @@ func authenHeader(next http.Handler) http.Handler {
 			failReq := FailedRequest{false, "authentication error"}
 			fail, err := json.Marshal(failReq)
 			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
 				log.Fatalf("Error happened in JSON marshal. Err: %s", err)
 				return
 			}
