@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
 type UserInformation struct {
@@ -25,23 +26,21 @@ func resInformationUser(w http.ResponseWriter, r *http.Request) {
 	userJson, err := json.Marshal(user)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+		log.Printf("Error happened in JSON marshal. Err: %s", err)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
 	w.Write(userJson)
 }
 
 func authenHeader(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
 		md := r.Header.Get("Authorization")
 		if md != "Bearer AKcqHRCTHaBLnznmH3fw6bRSMBSZpa9tAngkKnGydBmST5XFGpxzgsGMuT3z7QsZ" {
 			failReq := FailedRequest{false, "authentication error"}
 			fail, err := json.Marshal(failReq)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
-				log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+				log.Printf("Error happened in JSON marshal. Err: %s", err)
 				return
 			}
 			// http.Error(w, "authentication error", http.StatusForbidden)
@@ -57,6 +56,7 @@ func main() {
 	port := "3333"
 	log.Printf("Starting up on http://localhost:%s", port)
 	r := chi.NewRouter()
+	r.Use(middleware.SetHeader("Content-Type","application/json"))
 	r.Route("/api/me", func(r chi.Router) {
 		r.Use(authenHeader)
 		r.Get("/", resInformationUser)
