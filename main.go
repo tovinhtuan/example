@@ -28,7 +28,6 @@ func authenHeader(next http.Handler) http.Handler {
 		md := r.Header.Get("Authorization")
 		log.Println(md)
 		if md != "Bearer AKcqHRCTHaBLnznmH3fw6bRSMBSZpa9tAngkKnGydBmST5XFGpxzgsGMuT3z7QsZ"{
-			log.Println("nhay vao day")
 			return
 		}
 		next.ServeHTTP(w, r)
@@ -40,8 +39,10 @@ func main() {
 	log.Printf("Starting up on http://localhost:%s", port)
 
 	r := chi.NewRouter()
-	r.Use(authenHeader)
-	r.Get("/api/me", resInformationUser)
+	r.Route("/api/me",func(r chi.Router){
+		r.Use(authenHeader)
+		r.Get("/", resInformationUser)
+	})
 	log.Fatal(http.ListenAndServe(":"+port, r))
 }
 
