@@ -61,5 +61,5 @@ func main() {
 		r.Use(authenHeader)
 		r.Get("/", resInformationUser)
 	})
-	log.Fatal(http.ListenAndServe(":"+port, r))
+	http.ListenAndServe(":"+port,r)
 }
